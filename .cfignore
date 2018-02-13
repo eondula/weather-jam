@@ -1,8 +1,2 @@
-node_modules/
-*.DS_Store
-README.md
-.github/
-.git/
-.gitignore
-logs
-*.log
+node_modules
+

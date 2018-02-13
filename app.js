@@ -5,18 +5,23 @@ var cfenv = require("cfenv");
 var bodyParser = require('body-parser');
 var request = require('request');
 var twilio = require('twilio');
-var accountSid = 'AC81f9426ef6ec4f0613dd887332a2e288'; // Your Account SID from www.twilio.com/console
-var authToken = '2fb3816badfa4e1848053fb3c596177a';   // Your Auth Token from www.twilio.com/console
-var client = new twilio(accountSid, authToken);
 
-// Weather Company Credentials
-var username = "b5a5f1f9-5d84-4448-930e-1232f5814afc",
-    password = "3kO09TaoXU",
-    url = "https://" + username + ":" + password + "@twcservice.eu-gb.mybluemix.net/api/weather/v1/geocode/17.99702/-76.79358/observations.json?units=m&language=en-US";
+var getKingstontemperature = "api/weather/v1/geocode/17.99702/-76.79358/observations.json?units=m&language=en-US";
 
 // Twilio Credentials
-var myNumber = "+12019037695"; // Your Twilio Number
-var receiver = "+254728218370"; // Receiver Number
+var accountSid = '<account-SID>'; // Your Account SID from www.twilio.com/console
+var authToken = '<auth-token>';   // Your Auth Token from www.twilio.com/console
+
+
+// Weather Company Credentials
+
+var url = "<url-from-weather-company-data-service>" + getKingstontemperature;
+var client = new twilio(accountSid, authToken);
+
+
+// Your Twilio Number and Number you want to send text message to.
+var myNumber = "<twilio-number>"; // Your Twilio Number
+var receiver = "<receiver-number>"; // Receiver Number
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,7 +34,6 @@ app.get("/", function (req, res) {
     res.send("Hello, this is our backend!");
 });
 
-var temperature;
 setInterval(function () {
     var temperature;
     request(
@@ -43,13 +47,19 @@ setInterval(function () {
                 if(a === "observation") {
                     var b = data[a];
                     temperature = b.temp;
-                    if(temperature > 30 ){
-                        var msg = "High Temperature Alert!";
-                        sendMessage(myNumber,receiver, msg)
+                    console.log(temperature);
+                    if(temperature < 25 ){
+                        var msg = "Low Temperature Alert!!" + temperature + "°C";
+                        sendMessage(myNumber,receiver, msg);
+                    }
+                    else if(temperature > 30) {
+                        var text = "High Temperature Alert!!" + temperature + "°C";
+                        sendMessage(myNumber,receiver, text);
+
                     }
                     else {
-                        var text = "Everything is ok";
-                        sendMessage(myNumber,receiver, text)
+                        var mytext = "";
+                        sendMessage(myNumber,receiver, mytext);
 
                     }
 
@@ -69,6 +79,7 @@ function sendMessage(twilioNumber,receiverNumber,text) {
         to: receiverNumber,
         from: twilioNumber
     }).then (function (message) {
+        console.log("Text message sent to: " + receiverNumber);
         console.log(message.sid);
     });
 
